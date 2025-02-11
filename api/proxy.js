@@ -1,30 +1,34 @@
 export default async function handler(req, res) {
-  let { url } = req.query;
+  const { url } = req.query;
 
   if (!url) {
     return res.status(400).send("URL query parameter is required");
   }
 
-  // Auto-add 'https://' if missing
-  if (!url.startsWith("http://") && !url.startsWith("https://")) {
-    url = "https://" + url;
-  }
-
   try {
-    const response = await fetch(url);
-    
+    // Log the URL for debugging
+    console.log("Fetching URL:", url);
+
+    // Fetch the URL with headers to avoid potential blocking
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
+      }
+    });
+
     if (!response.ok) {
       return res.status(500).send("Failed to fetch the URL");
     }
 
     const data = await response.text();
+    
+    // Set CORS header to allow any origin
+    res.setHeader('Access-Control-Allow-Origin', '*');
 
-    // Add CORS headers to the response
-    res.setHeader("Access-Control-Allow-Origin", "*"); // Allow any domain to access your proxy
+    // Send back the data
     res.status(200).send(data);
   } catch (error) {
+    console.error("Error fetching the URL:", error);
     res.status(500).send("Error fetching the URL");
   }
 }
-
-
