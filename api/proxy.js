@@ -18,9 +18,13 @@ export default async function handler(req, res) {
     }
 
     const data = await response.text();
+
+    // Add CORS headers to the response
+    res.setHeader("Access-Control-Allow-Origin", "*"); // Allow any domain to access your proxy
     res.status(200).send(data);
   } catch (error) {
     res.status(500).send("Error fetching the URL");
   }
 }
+
 
