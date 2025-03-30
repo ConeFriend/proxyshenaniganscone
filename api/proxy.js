@@ -1,6 +1,6 @@
 import puppeteer from 'puppeteer-core';
-//test
- 
+import chrome from 'chrome-aws-lambda';
+
 export default async function handler(req, res) {
   const { url } = req.query;
 
@@ -9,11 +9,15 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Log the URL for debugging
     console.log("Rendering URL with Puppeteer:", url);
 
-    // Launch Puppeteer to render the page
-    const browser = await puppeteer.launch();
+    // Launch Chromium with chrome-aws-lambda
+    const browser = await puppeteer.launch({
+      args: [...chrome.args, '--disable-dev-shm-usage'],
+      executablePath: await chrome.executablePath,
+      headless: chrome.headless,
+    });
+
     const page = await browser.newPage();
     await page.goto(url, { waitUntil: 'domcontentloaded' });
 
