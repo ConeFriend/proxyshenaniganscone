@@ -1,5 +1,14 @@
 {
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/$1" }
+  ],
+  "builds": [
+    {
+      "src": "index.js",
+      "use": "@vercel/node",
+      "config": {
+        "buildCommand": "npm install --force && npm run build"
+      }
+    }
   ]
 }
