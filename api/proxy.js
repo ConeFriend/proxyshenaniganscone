@@ -19,7 +19,7 @@ export default async function handler(req, res) {
         '--disable-setuid-sandbox', 
         '--disable-dev-shm-usage',
       ],
-      executablePath: await chrome.executablePath, // Use the executable path from chrome-aws-lambda
+      executablePath: await chrome.executablePath, // This path ensures Puppeteer uses the right executable
       headless: chrome.headless, // Ensure headless mode for serverless environments
     });
 
