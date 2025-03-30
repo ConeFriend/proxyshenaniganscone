@@ -11,9 +11,14 @@ export default async function handler(req, res) {
   try {
     console.log("Rendering URL with Puppeteer:", url);
 
-    // Launch Chromium with chrome-aws-lambda
+    // Launch Chromium with chrome-aws-lambda and additional arguments
     const browser = await puppeteer.launch({
-      args: [...chrome.args, '--disable-dev-shm-usage'],
+      args: [
+        ...chrome.args, 
+        '--no-sandbox', 
+        '--disable-setuid-sandbox', 
+        '--disable-dev-shm-usage',
+      ],
       executablePath: await chrome.executablePath,
       headless: chrome.headless,
     });
