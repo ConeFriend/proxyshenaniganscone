@@ -11,16 +11,16 @@ export default async function handler(req, res) {
   try {
     console.log("Rendering URL with Puppeteer:", url);
 
-    // Launch Chromium with chrome-aws-lambda and additional arguments
+    // Launch Chromium using chrome-aws-lambda
     const browser = await puppeteer.launch({
       args: [
-        ...chrome.args, 
+        ...chrome.args,
         '--no-sandbox', 
         '--disable-setuid-sandbox', 
         '--disable-dev-shm-usage',
       ],
-      executablePath: await chrome.executablePath,
-      headless: chrome.headless,
+      executablePath: await chrome.executablePath, // Use the executable path from chrome-aws-lambda
+      headless: chrome.headless, // Ensure headless mode for serverless environments
     });
 
     const page = await browser.newPage();
