@@ -1,40 +1,25 @@
-import puppeteer from 'puppeteer-core';
-import chrome from 'chrome-aws-lambda';
+const puppeteer = require('puppeteer-core');
+const chromium = require('chrome-aws-lambda');
 
-export default async function handler(req, res) {
-  const { url } = req.query;
-
-  if (!url) {
-    return res.status(400).send("URL query parameter is required");
-  }
-
+module.exports = async (req, res) => {
   try {
-    console.log("Rendering URL with Puppeteer:", url);
-
-    // Launch Chromium using chrome-aws-lambda
+    console.log("Rendering URL with Puppeteer:", req.query.url);
+    
     const browser = await puppeteer.launch({
-      args: [
-        ...chrome.args,
-        '--no-sandbox', 
-        '--disable-setuid-sandbox', 
-        '--disable-dev-shm-usage',
-      ],
-      executablePath: await chrome.executablePath, // This path ensures Puppeteer uses the right executable
-      headless: chrome.headless, // Ensure headless mode for serverless environments
+      executablePath: await chromium.executablePath,
+      args: chromium.args,
+      headless: true
     });
 
     const page = await browser.newPage();
-    await page.goto(url, { waitUntil: 'domcontentloaded' });
+    await page.goto(req.query.url);
 
-    // Get the fully rendered HTML
-    const data = await page.content();
+    const content = await page.content();
     await browser.close();
 
-    // Set the correct headers for HTML content
-    res.setHeader('Content-Type', 'text/html');
-    res.status(200).send(data);
+    res.status(200).send(content);  // Send the rendered content back
   } catch (error) {
     console.error("Error rendering the URL:", error);
     res.status(500).send("Error rendering the URL");
   }
-}
+};
