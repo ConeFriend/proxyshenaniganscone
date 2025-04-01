@@ -6,6 +6,7 @@ const app = express();
 
 app.get('/', async (req, res) => {
   try {
+    console.log('Launching Puppeteer...');
     const browser = await puppeteer.launch({
       args: chromeLambda.args,
       executablePath: await chromeLambda.executablePath,
@@ -13,15 +14,17 @@ app.get('/', async (req, res) => {
     });
 
     const page = await browser.newPage();
+    console.log('Navigating to the page...');
     await page.goto('https://example.com');
     const content = await page.content();
 
     await browser.close();
 
+    console.log('Rendering page content...');
     res.send(content);
   } catch (error) {
     console.error('Error rendering page:', error);
-    res.status(500).send('Error rendering page');
+    res.status(500).send('Error rendering page: ' + error.message);
   }
 });
 
