@@ -1,24 +1,8 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "api/proxy.js",
-      "use": "@vercel/node"
+  "functions": {
+    "api/proxy.js": {
+      "runtime": "nodejs20.x"
     }
-  ],
-  "routes": [
-    {
-      "src": "/proxy/(.*)",
-      "dest": "/api/proxy.js"
-    }
-  ],
-  "builds": [
-    {
-      "src": "index.js",
-      "use": "@vercel/node",
-      "config": {
-        "buildCommand": "npm install --legacy-peer-deps && npm run build"
-      }
-    }
-  ]
+  }
 }
