@@ -2,24 +2,34 @@ const puppeteer = require('puppeteer-core');
 const chromium = require('chrome-aws-lambda');
 
 module.exports = async (req, res) => {
-  try {
-    console.log("Rendering URL with Puppeteer:", req.query.url);
-    
-    const browser = await puppeteer.launch({
-      executablePath: await chromium.executablePath,
-      args: chromium.args,
-      headless: true
-    });
+    const url = req.query.url;
 
-    const page = await browser.newPage();
-    await page.goto(req.query.url);
+    if (!url) {
+        return res.status(400).send("Missing 'url' parameter.");
+    }
 
-    const content = await page.content();
-    await browser.close();
+    let browser = null;
 
-    res.status(200).send(content);  // Send the rendered content back
-  } catch (error) {
-    console.error("Error rendering the URL:", error);
-    res.status(500).send("Error rendering the URL");
-  }
+    try {
+        browser = await puppeteer.launch({
+            args: chromium.args,
+            executablePath: await chromium.executablePath,
+            headless: chromium.headless,
+        });
+
+        const page = await browser.newPage();
+        await page.goto(url, { waitUntil: 'networkidle2' });
+
+        const content = await page.content();
+
+        res.setHeader('Content-Type', 'text/html');
+        res.send(content);
+    } catch (error) {
+        console.error("Error:", error);
+        res.status(500).send("Error loading page.");
+    } finally {
+        if (browser) {
+            await browser.close();
+        }
+    }
 };
