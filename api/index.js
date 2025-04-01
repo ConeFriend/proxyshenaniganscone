@@ -7,6 +7,8 @@ const app = express();
 app.get('/', async (req, res) => {
   try {
     console.log('Launching Puppeteer...');
+
+    // Launching Puppeteer with chrome-aws-lambda
     const browser = await puppeteer.launch({
       args: chromeLambda.args,
       executablePath: await chromeLambda.executablePath,
@@ -23,11 +25,12 @@ app.get('/', async (req, res) => {
     console.log('Rendering page content...');
     res.send(content);
   } catch (error) {
-    console.error('Error rendering page:', error);
+    console.error('Error rendering page:', error);  // Detailed logging
     res.status(500).send('Error rendering page: ' + error.message);
   }
 });
 
+// Start the server
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
